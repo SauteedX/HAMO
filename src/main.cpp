@@ -1,8 +1,8 @@
 #include <Arduino.h>
 void setup() {
-// write your initialization code here
+// hamo init!
 }
 
 void loop() {
-// write your code here
+// controls.
 }
