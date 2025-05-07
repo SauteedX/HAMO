@@ -51,7 +51,7 @@ void setup() {
     lcd.print("HAMO INIT...");
     
     // 센서들의 실제 값을 확인
-    if (!checkSensors()) {
+    if (!checkSensors()) {//initiation; self diagnosis
         errorHandle("Sensor Error");
         return;
     }
@@ -59,12 +59,24 @@ void setup() {
     lcd.print("OK!");
     delay(2000);
     lcd.clear();
+
+    lcd.setCursor(0, 0);
+    lcd.print("Face Normal.");
+    lcd.setCursor(0, 1);
+    lcd.print("Interaction: Hello");
+    delay(2000);
 }
 
 void loop() {
-    //Sensor Read
+    int pr = analogRead(PR_PIN);//Sensor Read
+    int tm = analogRead(TM_PIN);
+    int lm = analogRead(LM_PIN);
+    int rtcm = analogRead(RTCM_PIN);
+
     //Sensor Value Process
+
     //H.W. Control
+
     //APP output
 }
 //Compile Success.
