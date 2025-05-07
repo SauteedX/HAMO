@@ -2,12 +2,16 @@
 #include <Wire.h>
 #include <../lib/LiquidCrystal_I2C.h>
 
-const int PR_PIN = A0; //pressure
+const int PR_PIN = A0; //pressure                                          핀 지정자 헤더파일로 분리예정
 const int TM_PIN = A1; //temperature
 const int LM_PIN = A2; //lumen;LIGHT
 const int RTCM_PIN = A3; //RTC
 const int SCL_PIN = A4; //SCL
 const int SDA_PIN = A5; //SDA
+const int CARBON_PIN = A6; //carbon
+const int BMS_PIN = A7; //battery
+const int SD_PIN = 5;
+
 LiquidCrystal_I2C lcd(0x27, 16, 2); //temporal 16x2 code
 
 bool initSensors();
@@ -76,6 +80,8 @@ void loop() {
     //Sensor Value Process
 
     //H.W. Control
+
+    //BT Audio
 
     //APP output
 }
