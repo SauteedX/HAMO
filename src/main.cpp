@@ -50,7 +50,7 @@ void setup() {
     
     // 센서들의 실제 값을 확인
     if (!checkSensors()) {
-        errorHandle("Sensor Error");  // 이제 errorHandle 함수를 사용할 수 있습니다
+        errorHandle("Sensor Error");
         return;
     }
 
