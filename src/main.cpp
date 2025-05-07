@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <LiquidCrystal_I2C.h>
 #include <Wire.h>
+#include <../lib/LiquidCrystal_I2C.h>
 
 const int PR_PIN = A0; //pressure
 const int TM_PIN = A1; //temperature
@@ -61,6 +61,7 @@ void setup() {
 }
 
 void loop() {
-
 }
+//Compile Success.
 
+//XEN 2505071056
