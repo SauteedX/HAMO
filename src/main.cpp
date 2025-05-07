@@ -2,22 +2,24 @@
 #include <Wire.h>
 #include <../lib/LiquidCrystal_I2C.h>
 
-const int PR_PIN = A0; //pressure                                          핀 지정자 헤더파일로 분리예정
+const int PR_PIN = A0; //pressure          INPUT PHASE                          핀 지정자 헤더파일로 분리예정
 const int TM_PIN = A1; //temperature
 const int LM_PIN = A2; //lumen;LIGHT
-const int RTCM_PIN = A3; //RTC
-const int SCL_PIN = A4; //SCL
-const int SDA_PIN = A5; //SDA
-const int CARBON_PIN = A6; //carbon
-const int BMS_PIN = A7; //battery
-const int SD_PIN = 5;
+const int RTCM_PIN = 3; //RTC
+
+const int SCL_PIN = 21; //DUE SCL            LCD PHASE
+const int SDA_PIN = 20; //DUE SDA
+
+const int CARBON_PIN = 4; //carbon        OUTPUT PHASE
+const int BMS_PIN = 5; //battery
+const int SD_PIN = 6; //SD
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); //temporal 16x2 code
 
 bool initSensors();
 
 // 에러 처리를 위한 함수 정의
-void errorHandle(const char* errorMessage) {
+[[noreturn]] void errorHandle(const char* errorMessage) {
     Serial.println(errorMessage);
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -38,7 +40,7 @@ bool checkSensors() {
     int prValue = analogRead(PR_PIN);
     int tmValue = analogRead(TM_PIN);
     int lmValue = analogRead(LM_PIN);
-    int rtcmValue = analogRead(RTCM_PIN);
+    int rtcmValue = digitalRead(RTCM_PIN);
 
     return (prValue >= 0 && prValue <= 1023 &&
             tmValue >= 0 && tmValue <= 1023 &&
@@ -56,8 +58,7 @@ void setup() {
     
     // 센서들의 실제 값을 확인
     if (!checkSensors()) {//initiation; self diagnosis
-        errorHandle("Sensor Error");
-        return;
+        errorHandle("SensorInitErr");
     }
     lcd.setCursor(0, 1);
     lcd.print("OK!");
@@ -75,7 +76,8 @@ void loop() {
     int pr = analogRead(PR_PIN);//Sensor Read
     int tm = analogRead(TM_PIN);
     int lm = analogRead(LM_PIN);
-    int rtcm = analogRead(RTCM_PIN);
+    int rtcm = digitalRead(RTCM_PIN);
+
 
     //Sensor Value Process
 
