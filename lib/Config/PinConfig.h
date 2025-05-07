@@ -3,8 +3,8 @@
 #define PIN_CONFIG_H
 
 // MAX98357A SPI 핀 정의
-#define MAX98357A_SCK  76  // Due의 SCK
-#define MAX98357A_MOSI 75  // Due의 MOSI (DIN으로 사용)
+#define MAX98357A_SCK  3   // Due의 SCK
+#define MAX98357A_MOSI 4   // Due의 MOSI (DIN으로 사용)
 #define MAX98357A_SS   14  // Shutdown 핀
 #define MAX98357A_MODE 13  // Mono/Stereo 선택
 
