@@ -1,57 +1,66 @@
 #include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 
-// 핀 정의
-const int LED_PIN = 13;        // 내장 LED
-const int BUTTON_PIN = 2;      // 버튼 입력
-const int ANALOG_PIN = A0;     // 아날로그 입력 (예: 포텐셔미터)
+const int PR_PIN = A0; //pressure
+const int TM_PIN = A1; //temperature
+const int LM_PIN = A2; //lumen;LIGHT
+const int RTCM_PIN = A3; //RTC
+const int SCL_PIN = A4; //SCL
+const int SDA_PIN = A5; //SDA
+LiquidCrystal_I2C lcd(0x27, 16, 2); //temporal 16x2 code
 
-// 변수 선언
-int buttonState = 0;
-int analogValue = 0;
-unsigned long previousMillis = 0;
-const long interval = 1000;    // LED 깜빡임 간격 (1초)
-bool ledState = false;
+bool initSensors();
+
+// 에러 처리를 위한 함수 정의
+void errorHandle(const char* errorMessage) {
+    Serial.println(errorMessage);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(errorMessage);
+    int t=0;
+    while(1) {
+        lcd.setCursor(0, 1);
+        lcd.print("Holding:");
+        lcd.print(t++);
+        lcd.print(" sec");
+        delay(1000);
+    }
+}
+
+bool checkSensors() {
+    // 각 센서의 값을 읽어서 유효한 범위인지 확인
+    int prValue = analogRead(PR_PIN);
+    int tmValue = analogRead(TM_PIN);
+    int lmValue = analogRead(LM_PIN);
+    int rtcmValue = analogRead(RTCM_PIN);
+
+    return (prValue >= 0 && prValue <= 1023 &&
+            tmValue >= 0 && tmValue <= 1023 &&
+            lmValue >= 0 && lmValue <= 1023 &&
+            rtcmValue >= 0 && rtcmValue <= 1023);
+}
 
 void setup() {
-  // 시리얼 통신 초기화
-  Serial.begin(9600);
-  
-  // 핀 모드 설정
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  
-  Serial.println("Arduino Uno 테스트 시작");
+    Serial.begin(9600);
+    Serial.println("Init Start!");
+    lcd.init();
+    lcd.backlight();
+    lcd.print("HAMO INIT...");
+    
+    // 센서들의 실제 값을 확인
+    if (!checkSensors()) {
+        errorHandle("Sensor Error");  // 이제 errorHandle 함수를 사용할 수 있습니다
+        return;
+    }
+
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("OK!");
+
 }
 
 void loop() {
-  // 1. LED 깜빡임 테스트
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-    ledState = !ledState;
-    digitalWrite(LED_PIN, ledState);
-  }
-  
-  // 2. 버튼 상태 읽기
-  buttonState = digitalRead(BUTTON_PIN);
-  if (buttonState == LOW) {  // 버튼이 눌렸을 때 (풀업 저항으로 인해 LOW가 눌린 상태)
-    Serial.println("버튼이 눌렸습니다!");
-  }
-  
-  // 3. 아날로그 값 읽기
-  analogValue = analogRead(ANALOG_PIN);
-  
-  // 4. 시리얼 모니터에 정보 출력 (500ms 마다)
-  static unsigned long lastPrint = 0;
-  if (currentMillis - lastPrint >= 500) {
-    lastPrint = currentMillis;
-    
-    Serial.println("\n--- 상태 정보 ---");
-    Serial.print("LED 상태: ");
-    Serial.println(ledState ? "켜짐" : "꺼짐");
-    Serial.print("버튼 상태: ");
-    Serial.println(buttonState == LOW ? "눌림" : "안눌림");
-    Serial.print("아날로그 값: ");
-    Serial.println(analogValue);
-  }
+
 }
+
