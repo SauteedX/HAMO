@@ -6,6 +6,7 @@ const int PR_PIN = A0; //pressure          INPUT PHASE                          
 const int TM_PIN = A1; //temperature
 const int LM_PIN = A2; //lumen;LIGHT
 const int RTCM_PIN = 3; //RTC
+const int MIC_PIN = A3; //MIC
 
 const int SCL_PIN = 21; //DUE SCL            LCD PHASE
 const int SDA_PIN = 20; //DUE SDA
@@ -41,11 +42,13 @@ bool checkSensors() {
     int tmValue = analogRead(TM_PIN);
     int lmValue = analogRead(LM_PIN);
     int rtcmValue = digitalRead(RTCM_PIN);
+    int micValue = analogRead(MIC_PIN);
 
     return (prValue >= 0 && prValue <= 1023 &&
             tmValue >= 0 && tmValue <= 1023 &&
             lmValue >= 0 && lmValue <= 1023 &&
-            rtcmValue >= 0 && rtcmValue <= 1023);
+            rtcmValue >= 0 && rtcmValue <= 1023 &&
+            micValue >= 0 && micValue <= 1023);
 }
 
 void setup() {
@@ -77,6 +80,8 @@ void loop() {
     int tm = analogRead(TM_PIN);
     int lm = analogRead(LM_PIN);
     int rtcm = digitalRead(RTCM_PIN);
+    int mic = digitalRead(MIC_PIN);
+    Serial.println(mic);
 
 
     //Sensor Value Process
