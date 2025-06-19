@@ -3,6 +3,7 @@
 BluetoothAudio::BluetoothAudio() : connected(false) {
 }
 
+
 bool BluetoothAudio::begin() {
     pinMode(BT_STATE_PIN, INPUT);
     pinMode(BT_EN_PIN, OUTPUT);
@@ -25,6 +26,15 @@ bool BluetoothAudio::begin() {
 
     sendATCommand("AT+RESET");
     delay(1000);
+    // AT 명령어 추가
+    sendATCommand("AT+CLASS=0x240404");  // 오디오 장치 클래스 설정
+    if (!waitForResponse("OK")) return false;
+
+    sendATCommand("AT+PSWD=1234");       // PIN 코드 설정
+    if (!waitForResponse("OK")) return false;
+
+    sendATCommand("AT+CMODE=0");         // 지정된 주소로만 연결
+    if (!waitForResponse("OK")) return false;
 
     return true;
 }

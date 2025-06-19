@@ -9,6 +9,8 @@ bool isBTMode = true;
 
 void setup() {
     Serial.begin(115200);
+    Serial2.begin(38400);
+
 
     // 오디오 플레이어 초기화
     if (!audio.begin()) {
@@ -27,6 +29,14 @@ void setup() {
 }
 
 void loop() {
+    if (Serial2.available()) {
+        Serial.print("BT 응답: ");
+        while (Serial2.available()) {
+            Serial.write(Serial2.read());
+        }
+        Serial.println();
+    }
+
     if (digitalRead(MODE_SWITCH_PIN) == LOW) {
         delay(DEBOUNCE_DELAY);
         if (digitalRead(MODE_SWITCH_PIN) == LOW) {
