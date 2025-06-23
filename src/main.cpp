@@ -45,6 +45,8 @@ void loop() {
                 audio.stopAudio();
             } else {
                 bluetooth.stop();
+                // SD 카드 모드로 전환시 파일 선택 메뉴 표시
+                audio.selectAndPlayFile();
             }
 
             digitalWrite(BT_LED_PIN, isBTMode);
@@ -58,7 +60,13 @@ void loop() {
     if (isBTMode) {
         bluetooth.process();
     } else {
-        audio.playAudioFile("audio.wav");
+        // Serial에서 'n' 또는 'N'을 입력받으면 다음 곡 선택
+        if (Serial.available()) {
+            char input = Serial.read();
+            if (input == 'n' || input == 'N') {
+                audio.selectAndPlayFile();
+            }
+        }
     }
 }
 
