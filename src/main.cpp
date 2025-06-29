@@ -1,16 +1,11 @@
 #include <Arduino.h>
 #include "../lib/Audio/AudioDue.h"
-#include "../lib/Bluetooth/BluetoothAudio.h"
 #include "../lib/Config/PinConfig.h"
 
 AudioPlayer audio;
-BluetoothAudio bluetooth;
-bool isBTMode = true;
 
 void setup() {
     Serial.begin(115200);
-    Serial2.begin(38400);
-
 
     // 오디오 플레이어 초기화
     if (!audio.begin()) {
@@ -18,56 +13,33 @@ void setup() {
         while (1);
     }
 
-    // LED 핀 설정
-    pinMode(BT_LED_PIN, OUTPUT);
-    pinMode(SD_LED_PIN, OUTPUT);
-    pinMode(MODE_SWITCH_PIN, INPUT_PULLUP);
-
-    // 초기 모드 표시
-    digitalWrite(BT_LED_PIN, HIGH);
-    digitalWrite(SD_LED_PIN, LOW);
+    Serial.println("=== HAMO 오디오 플레이어 ===");
+    Serial.println("명령어 안내:");
+    Serial.println("l: 파일 목록 보기");
+    Serial.println("1-9: 파일 선택 및 재생");
+    Serial.println("s: 재생 중지");
+    Serial.println("=========================");
+    
+    // 초기 파일 목록 표시
+    audio.listFiles();
 }
 
 void loop() {
-    if (Serial2.available()) {
-        Serial.print("BT 응답: ");
-        while (Serial2.available()) {
-            Serial.write(Serial2.read());
+    if (Serial.available()) {
+        char input = Serial.read();
+        
+        if (input == 'l' || input == 'L') {
+            audio.listFiles();
         }
-        Serial.println();
-    }
-
-    if (digitalRead(MODE_SWITCH_PIN) == LOW) {
-        delay(DEBOUNCE_DELAY);
-        if (digitalRead(MODE_SWITCH_PIN) == LOW) {
-            isBTMode = !isBTMode;
-            if (isBTMode) {
-                audio.stopAudio();
-            } else {
-                bluetooth.stop();
-                // SD 카드 모드로 전환시 파일 선택 메뉴 표시
-                audio.selectAndPlayFile();
-            }
-
-            digitalWrite(BT_LED_PIN, isBTMode);
-            digitalWrite(SD_LED_PIN, !isBTMode);
-
-            while (digitalRead(MODE_SWITCH_PIN) == LOW);
-            delay(DEBOUNCE_DELAY);
+        else if (input == 's' || input == 'S') {
+            audio.stopAudio();
+            Serial.println("재생 중지됨");
         }
-    }
-
-    if (isBTMode) {
-        bluetooth.process();
-    } else {
-        // Serial에서 'n' 또는 'N'을 입력받으면 다음 곡 선택
-        if (Serial.available()) {
-            char input = Serial.read();
-            if (input == 'n' || input == 'N') {
-                audio.selectAndPlayFile();
-            }
+        else if (input >= '1' && input <= '9') {
+            audio.selectAndPlayFile();
         }
     }
 }
 
-//FINALLY FUCKING SUCCESS AFTER 33 FUCKING TRIALS HAHA
+//BT기능 삭제 완료
+//lib/Bluetooth/BluetoothAudio.cpp, lib/Bluetooth/BluetoothAudio.h --remove
