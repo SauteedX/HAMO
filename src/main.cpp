@@ -7,9 +7,11 @@ const int TM_PIN = A1; //temperature
 const int LM_PIN = A2; //lumen;LIGHT
 const int RTCM_PIN = 3; //RTC
 const int MIC_PIN = A3; //MIC
-
+/*
 const int SCL_PIN = 21; //DUE SCL            LCD PHASE
 const int SDA_PIN = 20; //DUE SDA
+*/
+
 
 const int CARBON_PIN = 4; //carbon        OUTPUT PHASE
 const int BMS_PIN = 5; //battery
