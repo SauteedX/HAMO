@@ -11,22 +11,25 @@ class AudioPlayer {
 public:
     AudioPlayer();
     bool begin();
-    void setupSPI();
+    bool setupSPI();
     void setupDAC();
+    void setupAudioPins();      // MAX98357A 핀 설정
+    bool reinitializeSD();      // SD 카드 재초기화
     void playAudioFile(const char* filename);
     void stopAudio();
     void setVolume(uint8_t volume);
-    void listFiles();           // 파일 목록 표시
-    bool selectAndPlayFile();   // 파일 선택 및 재생
+    void listFiles();
+    bool selectAndPlayFile();
 
 private:
     void writeSample(int16_t sample);
     void processSample(int16_t sample);
-    void printDirectory(File dir, int numTabs = 0);  // 디렉토리 내용 출력
+    void printDirectory(File dir, int numTabs = 0);
 
     SPISettings spiSettings;
     uint8_t currentVolume;
     bool isPlaying;
+    int workingCSPin;
 };
 
 #endif // AUDIO_DUE_H

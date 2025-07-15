@@ -10,6 +10,14 @@
 // SD 카드 핀
 #define SD_CS_PIN 10
 
+// 보드별 오디오 출력 핀 정의
+#if defined(ARDUINO_SAM_DUE)
+    // Arduino Due는 내장 DAC 사용 (DAC0는 코드에서 직접 사용)
+#elif defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_NANO) || defined(__AVR__)
+    // AVR 보드는 PWM 핀 사용
+    #define PWM_DAC_PIN 9  // PWM 가능한 핀 (chiwawa 보드에 맞게 조정)
+#endif
+
 // 오디오 관련 상수
 #define SAMPLE_RATE 44100
 #define BITS_PER_SAMPLE 16
