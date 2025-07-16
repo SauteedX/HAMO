@@ -473,3 +473,5 @@ bool AudioPlayer::selectAndPlayFile() {
         return false;
     }
 }
+//첫번째 초기화 시에는 정상작동
+//두번째 이후부터는 최신화/리딩이 안됨 시발
