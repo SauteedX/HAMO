@@ -17,7 +17,7 @@ bool BluetoothAudio::begin() {
     Serial2.begin(38400);  // BT-05/HC-05 기본 속도
 
     // 필수적이지는 않지만, 이름/모드 세팅 (커스텀 가능)
-    sendATCommand("AT+NAME=HamoBT");
+    sendATCommand("AT+NAME=HAMO-HC05");
     waitForResponse("OK");
     sendATCommand("AT+ROLE=0");        // Slave
     waitForResponse("OK");

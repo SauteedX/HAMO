@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include "../lib/Bluetooth/BluetoothAudio.h"
+
 // MAX98357A 핀 정의 (I2S)
 #define I2S_BCLK   76   // BIT_CLOCK, 예시: Due 보드의 SCK1 (실핀번호 확인필수)
 #define I2S_LRC    3    // WORD SELECT, 예시: D3
@@ -26,7 +28,7 @@ void setup() {
     delay(100);
 
     // 블루투스 시리얼(UART2) 초기화
-    Serial2.begin(9600);
+    Serial2.begin(38400);
 
     // MAX98357A (I2S) 관련, 실제 오디오 출력 원하면 I2S 라이브러리 필요
     // 현재 예제는 블루투스 명령만 수신 후 시리얼 응답
