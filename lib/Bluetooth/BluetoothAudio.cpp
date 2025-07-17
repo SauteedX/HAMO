@@ -1,64 +1,60 @@
 #include "BluetoothAudio.h"
+#include "../Config/PinConfig.h"
 
-BluetoothAudio::BluetoothAudio() : connected(false) {
-}
 
+BluetoothAudio::BluetoothAudio() : connected(false), hasNewCmd(false), latestCmd(0) {}
 
 bool BluetoothAudio::begin() {
     pinMode(BT_STATE_PIN, INPUT);
     pinMode(BT_EN_PIN, OUTPUT);
 
-    // HC-05 모듈 리셋
+    // BT-05 모듈 리셋
     digitalWrite(BT_EN_PIN, LOW);
     delay(100);
     digitalWrite(BT_EN_PIN, HIGH);
     delay(100);
 
-    // Serial2를 블루투스 통신용으로 사용
-    Serial2.begin(38400);  // HC-05 기본 통신 속도
+    Serial2.begin(38400);  // BT-05/HC-05 기본 속도
 
-    // AT 명령어로 설정
-    sendATCommand("AT+NAME=HAMO Speaker");
-    if (!waitForResponse("OK")) return false;
-
-    sendATCommand("AT+ROLE=0");  // Slave 모드
-    if (!waitForResponse("OK")) return false;
-
+    // 필수적이지는 않지만, 이름/모드 세팅 (커스텀 가능)
+    sendATCommand("AT+NAME=HamoBT");
+    waitForResponse("OK");
+    sendATCommand("AT+ROLE=0");        // Slave
+    waitForResponse("OK");
     sendATCommand("AT+RESET");
-    delay(1000);
-    // AT 명령어 추가
-    sendATCommand("AT+CLASS=0x240404");  // 오디오 장치 클래스 설정
-    if (!waitForResponse("OK")) return false;
-
-    sendATCommand("AT+PSWD=1234");       // PIN 코드 설정
-    if (!waitForResponse("OK")) return false;
-
-    sendATCommand("AT+CMODE=0");         // 지정된 주소로만 연결
-    if (!waitForResponse("OK")) return false;
+    delay(500);
 
     return true;
 }
 
 void BluetoothAudio::process() {
     connected = digitalRead(BT_STATE_PIN) == HIGH;
-
-    if (connected && Serial2.available() >= AUDIO_BUFFER_SIZE) {
-        int bytesRead = Serial2.readBytes(audioBuffer, AUDIO_BUFFER_SIZE);
-        // 오디오 데이터 처리...
+    while (Serial2.available()) {
+        latestCmd = Serial2.read();   // 가장 최근 명령 저장 (한 글자 처리)
+        hasNewCmd = true;
     }
 }
 
+bool BluetoothAudio::hasCommand() {
+    return hasNewCmd;
+}
+
+char BluetoothAudio::readCommand() {
+    hasNewCmd = false;
+    return latestCmd;
+}
+
 void BluetoothAudio::sendATCommand(const char* command) {
-    Serial2.println(command);
-    delay(100);
+    Serial2.print(command);
+    Serial2.print("\r\n");
+    delay(200);
 }
 
 bool BluetoothAudio::waitForResponse(const char* expected, unsigned long timeout) {
     unsigned long startTime = millis();
     String response = "";
-
     while (millis() - startTime < timeout) {
-        if (Serial2.available()) {
+        while (Serial2.available()) {
             char c = Serial2.read();
             response += c;
             if (response.indexOf(expected) != -1) {
@@ -71,12 +67,4 @@ bool BluetoothAudio::waitForResponse(const char* expected, unsigned long timeout
 
 bool BluetoothAudio::isConnected() {
     return connected;
-}
-
-void BluetoothAudio::stop() {
-    // 필요한 정지 로직 구현
-}
-
-void BluetoothAudio::setVolume(uint8_t volume) {
-    // 볼륨 제어 로직 구현
 }

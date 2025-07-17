@@ -20,6 +20,7 @@ public:
     void setVolume(uint8_t volume);
     void listFiles();
     bool selectAndPlayFile();
+    bool selectAndPlayFile(int fileNum); // 추가!
 
 private:
     void writeSample(int16_t sample);
