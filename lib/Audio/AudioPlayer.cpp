@@ -299,9 +299,8 @@ void AudioPlayer::setVolume(uint8_t volume) {
     Serial.print("볼륨 설정: ");
     Serial.println(volume);
 }
-
 void AudioPlayer::listFiles() {
-    Serial.println("\n=== 파일 목록 (복구 로직 포함) ===");
+    Serial.println("\n=== 파일 목록 (Genuino 101 호환) ===");
 
     if (workingCSPin == -1) {
         Serial.println("SD 카드가 초기화되지 않았습니다!");
@@ -312,18 +311,15 @@ void AudioPlayer::listFiles() {
     Serial.print(workingCSPin);
     Serial.println(" 사용 중");
 
-    // 1차 시도: 기본 파일 목록 읽기
-    Serial.println("1차 시도: 기본 파일 목록 읽기...");
-
+    // 항상 매번 새 핸들로!
     File root = SD.open("/");
     if (!root) {
-        Serial.println("1차 시도 실패 - SD 카드 재초기화 시도");
+        Serial.println("루트 디렉토리 열기 실패 - SD 카드 재초기화 시도");
 
         if (!reinitializeSD()) {
             Serial.println("SD 카드 재초기화 실패!");
             return;
         }
-
         root = SD.open("/");
         if (!root) {
             Serial.println("재초기화 후에도 루트 디렉토리 열기 실패!");
@@ -332,28 +328,22 @@ void AudioPlayer::listFiles() {
     }
 
     Serial.println("루트 디렉토리 열기 성공");
-
-    // 2. 파일 목록 출력
     Serial.println("파일 목록:");
+
     int totalFiles = 0;
     int wavFiles = 0;
 
-    // 디렉토리 처음부터 다시 읽기
-    root.rewindDirectory();
-
-    // 최대 시도 횟수 제한
-    int maxAttempts = 20;
-    int attempts = 0;
-
-    while (attempts < maxAttempts) {
+    // openNextFile()의 File은 반드시 지역변수로 받고 곧바로 close!
+    while (true) {
         File entry = root.openNextFile();
         if (!entry) {
-            Serial.println("파일 목록 끝");
             break;
         }
+        // SYSTEM~1 등 시스템 폴더는 일반 사용자에게 숨기려면 아래 한줄 사용가능
+        // if (entry.name()[0] == '.') { entry.close(); continue; }
 
-        attempts++;
         totalFiles++;
+
         String fileName = String(entry.name());
 
         Serial.print(totalFiles);
@@ -367,8 +357,6 @@ void AudioPlayer::listFiles() {
             Serial.print(", DIR");
         } else {
             Serial.print(", FILE");
-
-            // WAV 파일 확인
             String upperName = fileName;
             upperName.toUpperCase();
             if (upperName.endsWith(".WAV")) {
@@ -378,13 +366,10 @@ void AudioPlayer::listFiles() {
         }
         Serial.println(")");
 
-        entry.close();
-
-        // 메모리 안정화를 위한 딜레이
-        delay(50);
+        entry.close(); // 중요!
     }
 
-    root.close();
+    root.close(); // 중요!!
 
     Serial.print("총 ");
     Serial.print(totalFiles);
