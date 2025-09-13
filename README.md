@@ -22,3 +22,5 @@
 ![22](https://github.com/user-attachments/assets/025cd475-313e-44be-a1ff-ab2e0c2f788f)
 ![23](https://github.com/user-attachments/assets/3e6c7032-1b8e-4042-8c30-7a6f8bbd0156)
 ![APPLICATION](https://github.com/user-attachments/assets/9edd7d79-c658-425b-9aea-02900736f1fb)
+
+Rest of the project is @ SauteedX/HAMOSensor
